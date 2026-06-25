@@ -38,11 +38,6 @@ export async function Header() {
           <CartButton />
           {user ? (
             <div className="hidden items-center gap-2 md:flex">
-              {user.role === "ADMIN" && (
-                <Button href="/admin" variant="outline">
-                  Panel
-                </Button>
-              )}
               <Button href="/hesabim" variant="ghost">
                 Hesabım
               </Button>
@@ -55,7 +50,7 @@ export async function Header() {
               <Button href="/kayit">Üye Ol</Button>
             </div>
           )}
-          <MobileMenu nav={NAV} isLoggedIn={!!user} isAdmin={user?.role === "ADMIN"} />
+          <MobileMenu nav={NAV} isLoggedIn={!!user} />
         </div>
       </div>
     </header>

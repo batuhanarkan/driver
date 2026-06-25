@@ -8,11 +8,9 @@ type NavItem = { href: string; label: string };
 export function MobileMenu({
   nav,
   isLoggedIn,
-  isAdmin,
 }: {
   nav: NavItem[];
   isLoggedIn: boolean;
-  isAdmin: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const close = () => setOpen(false);
@@ -54,11 +52,6 @@ export function MobileMenu({
               </Link>
             ))}
             <div className="mt-6 h-px bg-line/60" />
-            {isAdmin && (
-              <Link href="/admin" onClick={close} className="text-xl text-gold">
-                Yönetim Paneli
-              </Link>
-            )}
             {isLoggedIn ? (
               <Link href="/hesabim" onClick={close} className="text-xl text-cream/80">
                 Hesabım

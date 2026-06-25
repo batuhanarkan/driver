@@ -57,11 +57,6 @@ export default async function HesabimPage({
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            {isAdmin && (
-              <Button href="/admin" variant="outline">
-                Yönetim Paneli
-              </Button>
-            )}
             <SignOutButton />
           </div>
         </div>
