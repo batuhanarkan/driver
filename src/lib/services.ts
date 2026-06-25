@@ -62,8 +62,16 @@ export async function getVehicles() {
 }
 
 export async function getActiveCampaigns() {
+  const now = new Date();
   return db.campaign.findMany({
-    where: { aktif: true },
+    where: {
+      aktif: true,
+      AND: [
+        { OR: [{ baslangic: null }, { baslangic: { lte: now } }] },
+        { OR: [{ bitis: null }, { bitis: { gte: now } }] },
+      ],
+    },
+    include: { service: true },
     orderBy: { createdAt: "desc" },
   });
 }

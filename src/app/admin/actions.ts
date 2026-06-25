@@ -86,16 +86,29 @@ export type CampaignInput = {
   aciklama: string;
   indirimYuzde: number;
   aktif: boolean;
+  serviceId?: string | null;
+  baslangic?: string | null;
+  bitis?: string | null;
 };
 
 export async function saveCampaign(input: CampaignInput): Promise<ActionResult> {
   await requireAdmin();
   if (!input.baslik) return { ok: false, error: "Başlık zorunludur." };
+
+  const baslangic = input.baslangic ? new Date(input.baslangic) : null;
+  const bitis = input.bitis ? new Date(input.bitis) : null;
+  if (baslangic && bitis && bitis <= baslangic) {
+    return { ok: false, error: "Bitiş tarihi başlangıçtan sonra olmalı." };
+  }
+
   const data = {
     baslik: input.baslik,
     aciklama: input.aciklama,
     indirimYuzde: Math.min(100, Math.max(0, Math.round(input.indirimYuzde))),
     aktif: input.aktif,
+    serviceId: input.serviceId || null,
+    baslangic,
+    bitis,
   };
   if (input.id) {
     await db.campaign.update({ where: { id: input.id }, data });

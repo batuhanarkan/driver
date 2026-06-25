@@ -1,8 +1,22 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { getActiveCampaigns } from "@/lib/services";
 
 export const metadata: Metadata = { title: "Fırsatlar" };
+
+function gecerlilik(b: Date | null, e: Date | null): string | null {
+  const fmt = (d: Date) =>
+    d.toLocaleDateString("tr-TR", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  if (b && e) return `${fmt(b)} – ${fmt(e)} arası geçerli`;
+  if (e) return `${fmt(e)} tarihine kadar`;
+  if (b) return `${fmt(b)} itibarıyla`;
+  return null;
+}
 
 export default async function FirsatlarPage() {
   const campaigns = await getActiveCampaigns();
@@ -50,9 +64,31 @@ export default async function FirsatlarPage() {
                   <p className="mt-3 text-sm leading-relaxed text-cream/55">
                     {c.aciklama}
                   </p>
+                  <div className="mt-4 flex flex-wrap gap-2 text-xs">
+                    {c.service && (
+                      <Link
+                        href={`/hizmetler/${c.service.slug}`}
+                        className="rounded-full border border-gold/30 px-3 py-1 text-gold/90 transition hover:bg-gold/10"
+                      >
+                        {c.service.baslik}
+                      </Link>
+                    )}
+                    {gecerlilik(c.baslangic, c.bitis) && (
+                      <span className="rounded-full bg-cream/5 px-3 py-1 text-cream/55">
+                        {gecerlilik(c.baslangic, c.bitis)}
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <div className="mt-8">
-                  <Button href="/rezervasyon" variant="outline">
+                  <Button
+                    href={
+                      c.service
+                        ? `/rezervasyon?hizmet=${c.service.slug}`
+                        : "/rezervasyon"
+                    }
+                    variant="outline"
+                  >
                     Rezervasyon Yap
                   </Button>
                 </div>

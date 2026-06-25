@@ -172,6 +172,11 @@ export default async function HomePage() {
                 <p className="mt-2 text-sm leading-relaxed text-cream/55">
                   {c.aciklama}
                 </p>
+                {c.service && (
+                  <p className="mt-3 text-xs uppercase tracking-wide text-gold/70">
+                    {c.service.baslik}
+                  </p>
+                )}
               </div>
             ))}
           </div>

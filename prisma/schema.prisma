@@ -73,6 +73,7 @@ model Service {
   temelFiyat  Int
   aktif       Boolean         @default(true)
   orderItems  OrderItem[]
+  campaigns   Campaign[]
   createdAt   DateTime        @default(now())
 }
 
@@ -113,13 +114,17 @@ model OrderItem {
 }
 
 model Campaign {
-  id           String   @id @default(cuid())
+  id           String    @id @default(cuid())
   baslik       String
   aciklama     String
   gorsel       String?
-  indirimYuzde Int      @default(0)
-  aktif        Boolean  @default(true)
-  createdAt    DateTime @default(now())
+  indirimYuzde Int       @default(0)
+  aktif        Boolean   @default(true)
+  serviceId    String?
+  service      Service?  @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+  baslangic    DateTime?
+  bitis        DateTime?
+  createdAt    DateTime  @default(now())
 }
 
 model Lead {
