@@ -55,7 +55,70 @@ async function main() {
     });
   }
 
-  console.log("Seed tamamlandı: 1 admin + 5 hizmet + 4 araç + 3 kampanya");
+  // Şehirler + lokasyonlar + hizmet-şehir bağı — yoksa ekle
+  if ((await db.city.count()) === 0) {
+    const hizmetler = await db.service.findMany({ select: { id: true, slug: true } });
+    const idOf = (slug: string) => hizmetler.find((h) => h.slug === slug)!.id;
+
+    const sehirler = [
+      {
+        ad: "İstanbul", slug: "istanbul", siralama: 1,
+        hizmet: ["soforlu-arac", "transfer", "turlar", "ozel-rehberlik", "selamlama"],
+        lokasyon: [
+          { ad: "İstanbul Havalimanı (IST)", tip: "HAVALIMANI" },
+          { ad: "Sabiha Gökçen Havalimanı (SAW)", tip: "HAVALIMANI" },
+          { ad: "Taksim", tip: "SEMT" },
+          { ad: "Beşiktaş", tip: "SEMT" },
+          { ad: "Sultanahmet", tip: "SEMT" },
+          { ad: "Kadıköy", tip: "SEMT" },
+        ],
+      },
+      {
+        ad: "Ankara", slug: "ankara", siralama: 2,
+        hizmet: ["soforlu-arac", "transfer", "turlar"],
+        lokasyon: [
+          { ad: "Esenboğa Havalimanı (ESB)", tip: "HAVALIMANI" },
+          { ad: "Kızılay", tip: "SEMT" },
+          { ad: "Çankaya", tip: "SEMT" },
+        ],
+      },
+      {
+        ad: "İzmir", slug: "izmir", siralama: 3,
+        hizmet: ["soforlu-arac", "transfer", "turlar", "selamlama"],
+        lokasyon: [
+          { ad: "Adnan Menderes Havalimanı (ADB)", tip: "HAVALIMANI" },
+          { ad: "Alsancak", tip: "SEMT" },
+          { ad: "Çeşme", tip: "SEMT" },
+        ],
+      },
+      {
+        ad: "Antalya", slug: "antalya", siralama: 4,
+        hizmet: ["transfer", "turlar", "ozel-rehberlik"],
+        lokasyon: [
+          { ad: "Antalya Havalimanı (AYT)", tip: "HAVALIMANI" },
+          { ad: "Lara", tip: "SEMT" },
+          { ad: "Belek", tip: "SEMT" },
+          { ad: "Kaleiçi", tip: "SEMT" },
+        ],
+      },
+    ] as const;
+
+    for (const s of sehirler) {
+      await db.city.create({
+        data: {
+          ad: s.ad,
+          slug: s.slug,
+          siralama: s.siralama,
+          services: { connect: s.hizmet.map((slug) => ({ id: idOf(slug) })) },
+          locations: { create: s.lokasyon.map((l) => ({ ad: l.ad, tip: l.tip })) },
+        },
+      });
+    }
+  }
+
+  console.log(
+    "Seed tamamlandı: 1 admin + 5 hizmet + 4 araç + 3 kampanya + 4 şehir",
+  );
 }
 
 main().finally(() => db.$disconnect());

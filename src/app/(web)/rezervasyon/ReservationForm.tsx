@@ -45,10 +45,12 @@ export function ReservationForm({
   services,
   vehicles,
   defaultSlug,
+  defaults,
 }: {
   services: Svc[];
   vehicles: Veh[];
   defaultSlug?: string;
+  defaults?: { nereden?: string; nereye?: string; tarih?: string };
 }) {
   const router = useRouter();
   const add = useCart((s) => s.add);
@@ -57,7 +59,13 @@ export function ReservationForm({
     services.find((s) => s.slug === defaultSlug)?.id ?? services[0]?.id ?? "",
   );
   const [vehicleId, setVehicleId] = useState("");
-  const [values, setValues] = useState<Record<string, string>>({ kisi: "1", gun: "1" });
+  const [values, setValues] = useState<Record<string, string>>({
+    kisi: "1",
+    gun: "1",
+    ...(defaults?.nereden ? { alis: defaults.nereden } : {}),
+    ...(defaults?.nereye ? { varis: defaults.nereye } : {}),
+    ...(defaults?.tarih ? { tarih: defaults.tarih } : {}),
+  });
   const [error, setError] = useState<string | null>(null);
 
   const service = useMemo(

@@ -7,13 +7,20 @@ export const metadata: Metadata = { title: "Rezervasyon" };
 export default async function RezervasyonPage({
   searchParams,
 }: {
-  searchParams: Promise<{ hizmet?: string }>;
+  searchParams: Promise<{
+    hizmet?: string;
+    sehir?: string;
+    nereden?: string;
+    nereye?: string;
+    tarih?: string;
+  }>;
 }) {
-  const [{ hizmet }, services, vehicles] = await Promise.all([
+  const [sp, services, vehicles] = await Promise.all([
     searchParams,
     getServices(),
     getVehicles(),
   ]);
+  const hizmet = sp.hizmet;
 
   return (
     <section className="container-px mx-auto max-w-7xl py-20">
@@ -41,6 +48,7 @@ export default async function RezervasyonPage({
             fiyat: v.fiyat,
           }))}
           defaultSlug={hizmet}
+          defaults={{ nereden: sp.nereden, nereye: sp.nereye, tarih: sp.tarih }}
         />
       </div>
     </section>

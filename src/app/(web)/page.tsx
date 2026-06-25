@@ -1,13 +1,16 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { ServiceIcon } from "@/components/site/ServiceIcon";
+import { HeroSearch } from "@/components/site/HeroSearch";
 import { getServices, getActiveCampaigns, CATEGORY_META } from "@/lib/services";
+import { getCitiesForSearch } from "@/lib/cities";
 import { formatTRY } from "@/lib/format";
 
 export default async function HomePage() {
-  const [services, campaigns] = await Promise.all([
+  const [services, campaigns, cities] = await Promise.all([
     getServices(),
     getActiveCampaigns(),
+    getCitiesForSearch(),
   ]);
 
   return (
@@ -15,9 +18,9 @@ export default async function HomePage() {
       {/* HERO */}
       <section className="relative overflow-hidden">
         <div className="container-px mx-auto max-w-7xl py-24 md:py-36">
-          <div className="max-w-3xl">
+          <div className="max-w-4xl">
             <p className="animate-rise text-sm uppercase tracking-[0.32em] text-gold/80">
-              İstanbul · Premium Ulaşım
+              Türkiye geneli · Premium Ulaşım
             </p>
             <h1
               className="animate-rise mt-6 text-5xl leading-[1.05] md:text-7xl"
@@ -35,15 +38,10 @@ export default async function HomePage() {
               Tek talep, kusursuz organizasyon — VipDrive ekibi gerisini halleder.
             </p>
             <div
-              className="animate-rise mt-10 flex flex-wrap gap-4"
+              className="animate-rise mt-10"
               style={{ animationDelay: "0.24s" }}
             >
-              <Button href="#hizmetler" size="lg">
-                Hizmetleri Keşfet
-              </Button>
-              <Button href="/rezervasyon" size="lg" variant="outline">
-                Hemen Rezervasyon
-              </Button>
+              <HeroSearch cities={cities} />
             </div>
 
             <div

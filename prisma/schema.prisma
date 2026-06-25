@@ -41,6 +41,13 @@ enum LeadType {
   KARIYER
 }
 
+enum LocationType {
+  HAVALIMANI
+  OTEL
+  SEMT
+  DIGER
+}
+
 model User {
   id        String   @id @default(cuid())
   ad        String
@@ -74,6 +81,7 @@ model Service {
   aktif       Boolean         @default(true)
   orderItems  OrderItem[]
   campaigns   Campaign[]
+  cities      City[]
   createdAt   DateTime        @default(now())
 }
 
@@ -135,4 +143,24 @@ model Lead {
   telefon   String?
   mesaj     String
   createdAt DateTime @default(now())
+}
+
+model City {
+  id        String     @id @default(cuid())
+  ad        String
+  slug      String     @unique
+  aktif     Boolean    @default(true)
+  siralama  Int        @default(0)
+  locations Location[]
+  services  Service[]
+  createdAt DateTime   @default(now())
+}
+
+model Location {
+  id     String       @id @default(cuid())
+  cityId String
+  city   City         @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  ad     String
+  tip    LocationType @default(DIGER)
+  aktif  Boolean      @default(true)
 }
