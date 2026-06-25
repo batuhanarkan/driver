@@ -42,3 +42,6 @@ next-env.d.ts
 
 # local env
 .env
+
+# playwright mcp artefaktları
+.playwright-mcp/
