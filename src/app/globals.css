@@ -1,26 +1,113 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* Tipografi */
+  --font-display: var(--font-fraunces), Georgia, serif;
+  --font-body: var(--font-hanken), ui-sans-serif, system-ui, sans-serif;
+
+  /* Renkler — Gece Yarısı & Altın */
+  --color-ink: #0b0b0e;
+  --color-ink-2: #121217;
+  --color-surface: #1a1a21;
+  --color-line: #2a2a34;
+  --color-gold: #c9a24a;
+  --color-gold-2: #e6cf94;
+  --color-cream: #f3eee4;
+  --color-muted: #9b958a;
+
+  /* Yumuşaklık */
+  --radius: 0.9rem;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@layer base {
+  html {
+    color-scheme: dark;
+    scroll-behavior: smooth;
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  body {
+    background-color: var(--color-ink);
+    color: var(--color-cream);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  ::selection {
+    background: var(--color-gold);
+    color: #000;
+  }
+
+  /* Atmosfer: üstte yumuşak altın ışıması */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background:
+      radial-gradient(60rem 40rem at 75% -10%, rgba(201, 162, 74, 0.12), transparent 60%),
+      radial-gradient(50rem 40rem at 0% 0%, rgba(201, 162, 74, 0.05), transparent 55%);
+  }
+
+  /* İnce grain dokusu */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  ::-webkit-scrollbar { width: 10px; }
+  ::-webkit-scrollbar-track { background: var(--color-ink); }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-line);
+    border-radius: 99px;
+    border: 3px solid var(--color-ink);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  /* İçerik atmosferin üstünde kalsın */
+  .above { position: relative; z-index: 1; }
+
+  .container-px { padding-inline: clamp(1.25rem, 5vw, 4rem); }
+
+  .hairline { border-color: color-mix(in oklab, var(--color-line) 80%, transparent); }
+
+  /* Altın çerçeveli cam yüzey */
+  .glass {
+    background: color-mix(in oklab, var(--color-surface) 88%, transparent);
+    backdrop-filter: blur(12px);
+    border: 1px solid color-mix(in oklab, var(--color-line) 90%, transparent);
+  }
+
+  .gold-text {
+    background: linear-gradient(100deg, var(--color-gold-2), var(--color-gold));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Sayfa açılış animasyonu */
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate-rise { animation: rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+  @keyframes fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .animate-fade { animation: fade 1.2s ease both; }
 }

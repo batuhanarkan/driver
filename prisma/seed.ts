@@ -32,7 +32,30 @@ async function main() {
     });
   }
 
-  console.log("Seed tamamlandı: 1 admin + 5 hizmet");
+  // Araç filosu (şoförlü araç & transfer için) — yoksa ekle
+  if ((await db.vehicle.count()) === 0) {
+    await db.vehicle.createMany({
+      data: [
+        { ad: "Ekonomik Sedan", sinif: "EKONOMI", kapasite: 4, fiyat: 0 },
+        { ad: "Mercedes E-Serisi", sinif: "BUSINESS", kapasite: 3, fiyat: 500 },
+        { ad: "Mercedes Vito VIP", sinif: "VAN", kapasite: 6, fiyat: 800 },
+        { ad: "Mercedes S-Serisi", sinif: "LUKS", kapasite: 3, fiyat: 1500 },
+      ],
+    });
+  }
+
+  // Kampanyalar — yoksa ekle
+  if ((await db.campaign.count()) === 0) {
+    await db.campaign.createMany({
+      data: [
+        { baslik: "Havalimanı Transferinde %15", aciklama: "İlk transfer rezervasyonunuzda geçerli avantaj.", indirimYuzde: 15 },
+        { baslik: "Kurumsal Anlaşma Avantajı", aciklama: "Şirketinize özel aylık ulaşım paketleri.", indirimYuzde: 0 },
+        { baslik: "Hafta Sonu Şehir Turu", aciklama: "Rehberli İstanbul turlarında özel fiyat.", indirimYuzde: 10 },
+      ],
+    });
+  }
+
+  console.log("Seed tamamlandı: 1 admin + 5 hizmet + 4 araç + 3 kampanya");
 }
 
 main().finally(() => db.$disconnect());
