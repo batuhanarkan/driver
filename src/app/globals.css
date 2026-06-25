@@ -5,15 +5,17 @@
   --font-display: var(--font-fraunces), Georgia, serif;
   --font-body: var(--font-hanken), ui-sans-serif, system-ui, sans-serif;
 
-  /* Renkler — Gece Yarısı & Altın */
-  --color-ink: #0b0b0e;
-  --color-ink-2: #121217;
-  --color-surface: #1a1a21;
-  --color-line: #2a2a34;
-  --color-gold: #c9a24a;
-  --color-gold-2: #e6cf94;
-  --color-cream: #f3eee4;
-  --color-muted: #9b958a;
+  /* Renkler — Açık / Ivory & Altın
+     Not: token adları (ink/cream) korundu; değerler açık temaya göre yeniden tanımlandı.
+     bg-ink = ferah zemin, bg-surface = beyaz kart, text-cream = koyu metin. */
+  --color-ink: #efe8db;
+  --color-ink-2: #e6ddcb;
+  --color-surface: #ffffff;
+  --color-line: #ddd3bf;
+  --color-cream: #211f1a;
+  --color-muted: #6f685b;
+  --color-gold: #a87b29;
+  --color-gold-2: #c79a3f;
 
   /* Yumuşaklık */
   --radius: 0.9rem;
@@ -21,7 +23,7 @@
 
 @layer base {
   html {
-    color-scheme: dark;
+    color-scheme: light;
     scroll-behavior: smooth;
   }
 
@@ -35,16 +37,16 @@
 
   h1, h2, h3, h4 {
     font-family: var(--font-display);
-    font-weight: 500;
-    letter-spacing: -0.01em;
+    font-weight: 600;
+    letter-spacing: -0.02em;
   }
 
   ::selection {
     background: var(--color-gold);
-    color: #000;
+    color: #fff;
   }
 
-  /* Atmosfer: üstte yumuşak altın ışıması */
+  /* Atmosfer: üstte yumuşak altın ışıması (açık zeminde sıcak vurgu) */
   body::before {
     content: "";
     position: fixed;
@@ -52,22 +54,22 @@
     pointer-events: none;
     z-index: 0;
     background:
-      radial-gradient(60rem 40rem at 75% -10%, rgba(201, 162, 74, 0.12), transparent 60%),
-      radial-gradient(50rem 40rem at 0% 0%, rgba(201, 162, 74, 0.05), transparent 55%);
+      radial-gradient(58rem 38rem at 78% -12%, rgba(168, 123, 41, 0.1), transparent 60%),
+      radial-gradient(48rem 36rem at -5% 0%, rgba(168, 123, 41, 0.06), transparent 55%);
   }
 
-  /* İnce grain dokusu */
+  /* İnce kağıt dokusu */
   body::after {
     content: "";
     position: fixed;
     inset: 0;
     pointer-events: none;
     z-index: 0;
-    opacity: 0.04;
+    opacity: 0.03;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
-  ::-webkit-scrollbar { width: 10px; }
+  ::-webkit-scrollbar { width: 11px; }
   ::-webkit-scrollbar-track { background: var(--color-ink); }
   ::-webkit-scrollbar-thumb {
     background: var(--color-line);
@@ -82,17 +84,21 @@
 
   .container-px { padding-inline: clamp(1.25rem, 5vw, 4rem); }
 
-  .hairline { border-color: color-mix(in oklab, var(--color-line) 80%, transparent); }
+  .hairline { border-color: color-mix(in oklab, var(--color-line) 85%, transparent); }
 
-  /* Altın çerçeveli cam yüzey */
+  /* Beyaz cam yüzey + yumuşak gölge (derinlik) */
   .glass {
-    background: color-mix(in oklab, var(--color-surface) 88%, transparent);
+    background: color-mix(in oklab, var(--color-surface) 92%, transparent);
     backdrop-filter: blur(12px);
     border: 1px solid color-mix(in oklab, var(--color-line) 90%, transparent);
+    box-shadow: 0 18px 50px -24px rgba(40, 33, 16, 0.25);
   }
 
+  /* Kartlara hafif kalkış (yumuşak gölge) */
+  .lift { box-shadow: 0 14px 40px -22px rgba(40, 33, 16, 0.22); }
+
   .gold-text {
-    background: linear-gradient(100deg, var(--color-gold-2), var(--color-gold));
+    background: linear-gradient(100deg, var(--color-gold), var(--color-gold-2));
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;

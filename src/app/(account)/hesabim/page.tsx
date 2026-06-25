@@ -27,7 +27,7 @@ export default async function HesabimPage({
   return (
     <main className="container-px mx-auto max-w-5xl py-16">
       {siparis && (
-        <div className="animate-rise mb-10 rounded-[var(--radius)] border border-emerald-500/30 bg-emerald-500/10 p-5 text-emerald-300">
+        <div className="animate-rise mb-10 rounded-[var(--radius)] border border-emerald-500/30 bg-emerald-500/10 p-5 text-emerald-700">
           <p className="text-sm leading-relaxed">
             Siparişiniz alındı! Sipariş No:{" "}
             <span className="font-medium">{siparis}</span>. Ekibimiz en kısa

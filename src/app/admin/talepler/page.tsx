@@ -11,9 +11,9 @@ const LEAD_LABEL: Record<LeadType, string> = {
 };
 
 const LEAD_STYLE: Record<LeadType, string> = {
-  ILETISIM: "border-sky-500/30 bg-sky-500/15 text-sky-300",
+  ILETISIM: "border-sky-500/30 bg-sky-500/15 text-sky-700",
   KURUMSAL: "border-gold/30 bg-gold/15 text-gold-2",
-  KARIYER: "border-emerald-500/30 bg-emerald-500/15 text-emerald-300",
+  KARIYER: "border-emerald-500/30 bg-emerald-500/15 text-emerald-700",
 };
 
 const TYPES = Object.keys(LEAD_LABEL) as LeadType[];

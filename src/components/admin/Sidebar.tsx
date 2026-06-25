@@ -64,7 +64,7 @@ export function Sidebar({ userName }: { userName: string }) {
           </Link>
           <button
             onClick={() => signOut({ callbackUrl: "/" })}
-            className="rounded-xl px-4 py-2 text-left text-sm text-cream/65 transition hover:bg-cream/5 hover:text-rose-300"
+            className="rounded-xl px-4 py-2 text-left text-sm text-cream/65 transition hover:bg-cream/5 hover:text-rose-700"
           >
             Çıkış Yap
           </button>

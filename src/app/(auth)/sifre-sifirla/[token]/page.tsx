@@ -20,13 +20,13 @@ export default async function ResetPage({
     return (
       <div className="space-y-3">
         <h1 className="text-2xl font-semibold">Bağlantı geçersiz</h1>
-        <p className="text-sm text-neutral-400">
+        <p className="text-sm text-muted">
           Bu sıfırlama bağlantısı geçersiz veya süresi dolmuş. Lütfen yeni bir
           bağlantı talep et.
         </p>
         <a
           href="/sifre-sifirla"
-          className="block pt-2 text-center text-sm text-amber-400"
+          className="block pt-2 text-center text-sm text-gold"
         >
           Yeni bağlantı iste
         </a>

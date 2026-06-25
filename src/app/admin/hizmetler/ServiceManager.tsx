@@ -32,7 +32,7 @@ const KATEGORI_LABEL = Object.fromEntries(
 ) as Record<ServiceCategory, string>;
 
 const inputCls =
-  "w-full rounded-xl border border-line/70 bg-ink/60 px-4 py-3 text-cream outline-none transition focus:border-gold/60";
+  "w-full rounded-xl border border-line/70 bg-ink-2 px-4 py-3 text-cream outline-none transition focus:border-gold/60";
 
 const emptyForm: ServiceInput = {
   slug: "",
@@ -277,7 +277,7 @@ export function ServiceManager({ services }: { services: Service[] }) {
               </label>
             </div>
 
-            {error && <p className="mt-4 text-sm text-rose-400">{error}</p>}
+            {error && <p className="mt-4 text-sm text-rose-600">{error}</p>}
 
             <div className="mt-7 flex justify-end gap-3">
               <Button variant="ghost" onClick={close} disabled={pending}>

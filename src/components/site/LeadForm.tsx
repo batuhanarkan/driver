@@ -12,7 +12,7 @@ type Props = {
 };
 
 const inputCls =
-  "w-full rounded-xl border border-line/70 bg-ink/60 px-4 py-3 text-cream outline-none transition focus:border-gold/60";
+  "w-full rounded-xl border border-line/70 bg-ink-2 px-4 py-3 text-cream outline-none transition focus:border-gold/60";
 
 export function LeadForm({
   tip,
@@ -125,7 +125,7 @@ export function LeadForm({
           />
         </div>
 
-        {error && <p className="text-sm text-rose-400">{error}</p>}
+        {error && <p className="text-sm text-rose-600">{error}</p>}
 
         <Button type="submit" size="lg" disabled={pending} className="w-full">
           {pending ? "Gönderiliyor..." : submitLabel}

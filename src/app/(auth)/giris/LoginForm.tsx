@@ -38,26 +38,26 @@ export function LoginForm({
     <form onSubmit={onSubmit} className="space-y-4">
       <h1 className="text-2xl font-semibold">Giriş Yap</h1>
       {kayitBasarili && (
-        <p className="text-green-400 text-sm">Kayıt başarılı, giriş yapabilirsin.</p>
+        <p className="text-emerald-600 text-sm">Kayıt başarılı, giriş yapabilirsin.</p>
       )}
       {sifirlandi && (
-        <p className="text-green-400 text-sm">Şifren güncellendi, yeni şifrenle giriş yapabilirsin.</p>
+        <p className="text-emerald-600 text-sm">Şifren güncellendi, yeni şifrenle giriş yapabilirsin.</p>
       )}
-      {error && <p className="text-red-400 text-sm">{error}</p>}
-      <input name="email" type="email" placeholder="E-posta" className="w-full rounded bg-neutral-900 p-3" />
-      <input name="sifre" type="password" placeholder="Şifre" className="w-full rounded bg-neutral-900 p-3" />
+      {error && <p className="text-rose-600 text-sm">{error}</p>}
+      <input name="email" type="email" placeholder="E-posta" className="w-full rounded border border-line bg-white p-3" />
+      <input name="sifre" type="password" placeholder="Şifre" className="w-full rounded border border-line bg-white p-3" />
       <div className="text-right">
-        <a href="/sifre-sifirla" className="text-sm text-amber-400/80 transition hover:text-amber-400">
+        <a href="/sifre-sifirla" className="text-sm text-gold/80 transition hover:text-gold">
           Şifremi unuttum?
         </a>
       </div>
       <button
         disabled={pending}
-        className="w-full rounded bg-amber-500 p-3 font-medium text-black disabled:opacity-50"
+        className="w-full rounded bg-gold p-3 font-medium text-black disabled:opacity-50"
       >
         {pending ? "Giriş yapılıyor..." : "Giriş Yap"}
       </button>
-      <a href="/kayit" className="block text-center text-sm text-neutral-400">
+      <a href="/kayit" className="block text-center text-sm text-muted">
         Hesabın yok mu? Kayıt ol
       </a>
     </form>

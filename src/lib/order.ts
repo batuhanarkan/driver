@@ -49,9 +49,9 @@ export const STATUS_LABEL: Record<OrderStatus, string> = {
 
 /** Durum rozeti için renk sınıfı (Tailwind). */
 export const STATUS_STYLE: Record<OrderStatus, string> = {
-  BEKLEMEDE: "bg-amber-500/15 text-amber-300 border-amber-500/30",
-  ONAYLANDI: "bg-sky-500/15 text-sky-300 border-sky-500/30",
-  DEVAM_EDIYOR: "bg-violet-500/15 text-violet-300 border-violet-500/30",
-  TAMAMLANDI: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30",
-  IPTAL: "bg-rose-500/15 text-rose-300 border-rose-500/30",
+  BEKLEMEDE: "bg-amber-500/15 text-amber-700 border-amber-600/30",
+  ONAYLANDI: "bg-sky-500/15 text-sky-700 border-sky-600/30",
+  DEVAM_EDIYOR: "bg-violet-500/15 text-violet-700 border-violet-600/30",
+  TAMAMLANDI: "bg-emerald-500/15 text-emerald-700 border-emerald-600/30",
+  IPTAL: "bg-rose-500/15 text-rose-700 border-rose-600/30",
 };

@@ -53,7 +53,7 @@ export function StatusControl({
                 disabled={pending}
                 className={
                   iptal
-                    ? "rounded-xl border border-rose-500/40 bg-rose-500/10 px-4 py-2.5 text-sm font-medium text-rose-300 transition hover:bg-rose-500/20 disabled:opacity-50"
+                    ? "rounded-xl border border-rose-500/40 bg-rose-500/10 px-4 py-2.5 text-sm font-medium text-rose-700 transition hover:bg-rose-500/20 disabled:opacity-50"
                     : "rounded-xl border border-gold/50 bg-gold/10 px-4 py-2.5 text-sm font-medium text-gold transition hover:bg-gold/20 disabled:opacity-50"
                 }
               >
@@ -64,7 +64,7 @@ export function StatusControl({
         </div>
       )}
 
-      {error && <p className="mt-4 text-sm text-rose-400">{error}</p>}
+      {error && <p className="mt-4 text-sm text-rose-600">{error}</p>}
     </div>
   );
 }

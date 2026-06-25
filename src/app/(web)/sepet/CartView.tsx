@@ -88,7 +88,7 @@ export function CartView({ isLoggedIn }: { isLoggedIn: boolean }) {
                 )}
                 <button
                   onClick={() => remove(i.id)}
-                  className="mt-3 text-xs text-rose-400/80 transition hover:text-rose-300"
+                  className="mt-3 text-xs text-rose-600/80 transition hover:text-rose-700"
                 >
                   Kaldır
                 </button>
@@ -113,11 +113,11 @@ export function CartView({ isLoggedIn }: { isLoggedIn: boolean }) {
             value={not}
             onChange={(e) => setNot(e.target.value)}
             rows={3}
-            className="mt-2 w-full rounded-xl border border-line/70 bg-ink/60 px-4 py-3 text-sm text-cream outline-none transition focus:border-gold/60"
+            className="mt-2 w-full rounded-xl border border-line/70 bg-ink-2 px-4 py-3 text-sm text-cream outline-none transition focus:border-gold/60"
             placeholder="Eklemek istedikleriniz..."
           />
 
-          {error && <p className="mt-3 text-sm text-rose-400">{error}</p>}
+          {error && <p className="mt-3 text-sm text-rose-600">{error}</p>}
           {!isLoggedIn && (
             <p className="mt-3 text-xs text-cream/45">
               Siparişi göndermek için giriş yapmanız istenecek.

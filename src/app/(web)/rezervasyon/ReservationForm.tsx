@@ -39,7 +39,7 @@ const FIELDS: Record<ServiceCategory, FieldKey[]> = {
 };
 
 const inputCls =
-  "w-full rounded-xl border border-line/70 bg-ink/60 px-4 py-3 text-cream outline-none transition focus:border-gold/60";
+  "w-full rounded-xl border border-line/70 bg-ink-2 px-4 py-3 text-cream outline-none transition focus:border-gold/60";
 
 export function ReservationForm({
   services,
@@ -184,7 +184,7 @@ export function ReservationForm({
           )}
         </div>
 
-        {error && <p className="text-sm text-rose-400">{error}</p>}
+        {error && <p className="text-sm text-rose-600">{error}</p>}
       </div>
 
       {/* özet */}
