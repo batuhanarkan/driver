@@ -47,8 +47,18 @@ model User {
   email     String   @unique
   sifreHash String
   telefon   String?
-  rol       Role     @default(USER)
-  orders    Order[]
+  rol         Role                 @default(USER)
+  orders      Order[]
+  resetTokens PasswordResetToken[]
+  createdAt   DateTime             @default(now())
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
   createdAt DateTime @default(now())
 }
 

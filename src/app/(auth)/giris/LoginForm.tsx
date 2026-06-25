@@ -4,7 +4,13 @@ import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export function LoginForm({ kayitBasarili }: { kayitBasarili: boolean }) {
+export function LoginForm({
+  kayitBasarili,
+  sifirlandi,
+}: {
+  kayitBasarili: boolean;
+  sifirlandi: boolean;
+}) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -34,9 +40,17 @@ export function LoginForm({ kayitBasarili }: { kayitBasarili: boolean }) {
       {kayitBasarili && (
         <p className="text-green-400 text-sm">Kayıt başarılı, giriş yapabilirsin.</p>
       )}
+      {sifirlandi && (
+        <p className="text-green-400 text-sm">Şifren güncellendi, yeni şifrenle giriş yapabilirsin.</p>
+      )}
       {error && <p className="text-red-400 text-sm">{error}</p>}
       <input name="email" type="email" placeholder="E-posta" className="w-full rounded bg-neutral-900 p-3" />
       <input name="sifre" type="password" placeholder="Şifre" className="w-full rounded bg-neutral-900 p-3" />
+      <div className="text-right">
+        <a href="/sifre-sifirla" className="text-sm text-amber-400/80 transition hover:text-amber-400">
+          Şifremi unuttum?
+        </a>
+      </div>
       <button
         disabled={pending}
         className="w-full rounded bg-amber-500 p-3 font-medium text-black disabled:opacity-50"
