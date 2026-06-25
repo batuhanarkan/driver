@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { canTransition } from "@/lib/order";
+import { hashPassword } from "@/lib/password";
 import type { OrderStatus, ServiceCategory } from "@prisma/client";
 
 export type ActionResult = { ok: boolean; error?: string };
@@ -13,6 +14,7 @@ async function requireAdmin() {
   if (session?.user?.role !== "ADMIN") {
     throw new Error("Yetkisiz erişim");
   }
+  return session;
 }
 
 export async function updateOrderStatus(
@@ -225,5 +227,133 @@ export async function deleteLocation(id: string): Promise<ActionResult> {
   await db.location.delete({ where: { id } });
   revalidatePath("/admin/sehirler");
   revalidatePath("/");
+  return { ok: true };
+}
+
+/* ─────────── Araçlar ─────────── */
+
+export type VehicleInput = {
+  id?: string;
+  ad: string;
+  sinif: "EKONOMI" | "BUSINESS" | "VAN" | "LUKS";
+  kapasite: number;
+  fiyat: number;
+  aktif: boolean;
+};
+
+export async function saveVehicle(input: VehicleInput): Promise<ActionResult> {
+  await requireAdmin();
+  if (!input.ad) return { ok: false, error: "Araç adı zorunlu." };
+  const data = {
+    ad: input.ad,
+    sinif: input.sinif,
+    kapasite: Math.max(1, Math.round(input.kapasite) || 1),
+    fiyat: Math.max(0, Math.round(input.fiyat) || 0),
+    aktif: input.aktif,
+  };
+  if (input.id) await db.vehicle.update({ where: { id: input.id }, data });
+  else await db.vehicle.create({ data });
+  revalidatePath("/admin/araclar");
+  revalidatePath("/rezervasyon");
+  return { ok: true };
+}
+
+export async function toggleVehicle(
+  id: string,
+  aktif: boolean,
+): Promise<ActionResult> {
+  await requireAdmin();
+  await db.vehicle.update({ where: { id }, data: { aktif } });
+  revalidatePath("/admin/araclar");
+  revalidatePath("/rezervasyon");
+  return { ok: true };
+}
+
+export async function deleteVehicle(id: string): Promise<ActionResult> {
+  await requireAdmin();
+  try {
+    await db.vehicle.delete({ where: { id } });
+  } catch {
+    return {
+      ok: false,
+      error: "Bu araç bir siparişte kullanılmış, silinemez. Pasife alabilirsiniz.",
+    };
+  }
+  revalidatePath("/admin/araclar");
+  revalidatePath("/rezervasyon");
+  return { ok: true };
+}
+
+/* ─────────── Kullanıcılar ─────────── */
+
+export type AdminUserInput = {
+  ad: string;
+  email: string;
+  telefon?: string;
+  sifre: string;
+  rol: "USER" | "ADMIN";
+};
+
+export async function createUserByAdmin(
+  input: AdminUserInput,
+): Promise<ActionResult> {
+  await requireAdmin();
+  if (!input.ad || !input.email) return { ok: false, error: "Ad ve e-posta zorunlu." };
+  if (!input.sifre || input.sifre.length < 6) {
+    return { ok: false, error: "Şifre en az 6 karakter olmalı." };
+  }
+  const exists = await db.user.findUnique({ where: { email: input.email } });
+  if (exists) return { ok: false, error: "Bu e-posta zaten kayıtlı." };
+
+  await db.user.create({
+    data: {
+      ad: input.ad,
+      email: input.email,
+      telefon: input.telefon || null,
+      sifreHash: await hashPassword(input.sifre),
+      rol: input.rol,
+    },
+  });
+  revalidatePath("/admin/kullanicilar");
+  return { ok: true };
+}
+
+export async function setUserRole(
+  id: string,
+  rol: "USER" | "ADMIN",
+): Promise<ActionResult> {
+  await requireAdmin();
+  if (rol === "USER") {
+    const target = await db.user.findUnique({ where: { id } });
+    if (target?.rol === "ADMIN") {
+      const adminSayisi = await db.user.count({ where: { rol: "ADMIN" } });
+      if (adminSayisi <= 1) {
+        return { ok: false, error: "Son yöneticiyi düşüremezsiniz." };
+      }
+    }
+  }
+  await db.user.update({ where: { id }, data: { rol } });
+  revalidatePath("/admin/kullanicilar");
+  return { ok: true };
+}
+
+export async function deleteUserByAdmin(id: string): Promise<ActionResult> {
+  const session = await requireAdmin();
+  if (session.user.id === id) {
+    return { ok: false, error: "Kendinizi silemezsiniz." };
+  }
+  const target = await db.user.findUnique({ where: { id } });
+  if (target?.rol === "ADMIN") {
+    const adminSayisi = await db.user.count({ where: { rol: "ADMIN" } });
+    if (adminSayisi <= 1) {
+      return { ok: false, error: "Son yöneticiyi silemezsiniz." };
+    }
+  }
+  try {
+    await db.user.delete({ where: { id } });
+  } catch {
+    return { ok: false, error: "Bu kullanıcının siparişleri var, silinemez." };
+  }
+  revalidatePath("/admin/kullanicilar");
   return { ok: true };
 }
