@@ -1,0 +1,123 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum ServiceCategory {
+  CHAUFFEUR
+  TRANSFER
+  TOUR
+  GUIDE
+  GREETING
+}
+
+enum VehicleClass {
+  EKONOMI
+  BUSINESS
+  VAN
+  LUKS
+}
+
+enum OrderStatus {
+  BEKLEMEDE
+  ONAYLANDI
+  DEVAM_EDIYOR
+  TAMAMLANDI
+  IPTAL
+}
+
+enum LeadType {
+  ILETISIM
+  KURUMSAL
+  KARIYER
+}
+
+model User {
+  id        String   @id @default(cuid())
+  ad        String
+  email     String   @unique
+  sifreHash String
+  telefon   String?
+  rol       Role     @default(USER)
+  orders    Order[]
+  createdAt DateTime @default(now())
+}
+
+model Service {
+  id          String          @id @default(cuid())
+  slug        String          @unique
+  kategori    ServiceCategory
+  baslik      String
+  aciklama    String
+  kapakGorsel String?
+  gorseller   String[]
+  temelFiyat  Int
+  aktif       Boolean         @default(true)
+  orderItems  OrderItem[]
+  createdAt   DateTime        @default(now())
+}
+
+model Vehicle {
+  id         String       @id @default(cuid())
+  ad         String
+  sinif      VehicleClass
+  kapasite   Int
+  gorsel     String?
+  fiyat      Int
+  aktif      Boolean      @default(true)
+  orderItems OrderItem[]
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  siparisNo   String      @unique
+  userId      String
+  user        User        @relation(fields: [userId], references: [id])
+  durum       OrderStatus @default(BEKLEMEDE)
+  toplamTutar Int
+  not         String?
+  items       OrderItem[]
+  createdAt   DateTime    @default(now())
+}
+
+model OrderItem {
+  id         String   @id @default(cuid())
+  orderId    String
+  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  serviceId  String
+  service    Service  @relation(fields: [serviceId], references: [id])
+  vehicleId  String?
+  vehicle    Vehicle? @relation(fields: [vehicleId], references: [id])
+  detay      Json
+  birimFiyat Int
+  adet       Int      @default(1)
+}
+
+model Campaign {
+  id           String   @id @default(cuid())
+  baslik       String
+  aciklama     String
+  gorsel       String?
+  indirimYuzde Int      @default(0)
+  aktif        Boolean  @default(true)
+  createdAt    DateTime @default(now())
+}
+
+model Lead {
+  id        String   @id @default(cuid())
+  tip       LeadType
+  ad        String
+  email     String
+  telefon   String?
+  mesaj     String
+  createdAt DateTime @default(now())
+}
