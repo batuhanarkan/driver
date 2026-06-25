@@ -16,57 +16,71 @@ export default async function HomePage() {
   return (
     <>
       {/* HERO */}
-      <section className="relative overflow-hidden">
-        <div className="container-px mx-auto max-w-7xl py-24 md:py-36">
-          <div className="max-w-4xl">
-            <p className="animate-rise text-sm uppercase tracking-[0.32em] text-gold/80">
-              Türkiye geneli · Premium Ulaşım
-            </p>
-            <h1
-              className="animate-rise mt-6 text-5xl leading-[1.05] md:text-7xl"
-              style={{ animationDelay: "0.08s" }}
-            >
-              Ayrıcalıklı ulaşımın
-              <br />
-              <span className="gold-text italic">yeni adı.</span>
-            </h1>
-            <p
-              className="animate-rise mt-7 max-w-xl text-lg leading-relaxed text-cream/65"
-              style={{ animationDelay: "0.16s" }}
-            >
-              Şoförlü araç, havalimanı transferi, özel turlar ve VIP karşılama.
-              Tek talep, kusursuz organizasyon — VipDrive ekibi gerisini halleder.
-            </p>
-            <div
-              className="animate-rise mt-10"
-              style={{ animationDelay: "0.24s" }}
-            >
-              <HeroSearch cities={cities} />
-            </div>
-
-            <div
-              className="animate-rise mt-16 flex flex-wrap items-center gap-x-12 gap-y-6"
-              style={{ animationDelay: "0.32s" }}
-            >
-              {[
-                ["7/24", "Kesintisiz hizmet"],
-                ["5★", "Misafir memnuniyeti"],
-                ["1989", "Kökleşmiş tecrübe"],
-              ].map(([k, v]) => (
-                <div key={v}>
-                  <div className="font-display text-3xl text-gold">{k}</div>
-                  <div className="mt-1 text-sm text-cream/50">{v}</div>
-                </div>
-              ))}
-            </div>
-          </div>
+      <section className="relative overflow-hidden border-b hairline">
+        {/* yumuşak arka plan + sade silüet */}
+        <div className="pointer-events-none absolute inset-0 -z-0">
+          <div className="absolute inset-0 bg-gradient-to-b from-ink-2/70 via-ink to-ink" />
+          <svg
+            className="absolute inset-x-0 bottom-0 h-40 w-full text-gold/[0.07]"
+            viewBox="0 0 1200 160"
+            preserveAspectRatio="none"
+            fill="currentColor"
+            aria-hidden
+          >
+            <path d="M0 160 V96 h60 v-22 h26 v22 h40 V70 h22 v90 z" />
+            <path d="M180 160 V60 h34 v-30 h18 v30 h30 v40 h28 v60 z" />
+            <path d="M340 160 V84 h44 v-18 h22 v18 h38 v76 z" />
+            <path d="M500 160 V54 h30 v-26 h16 v26 h34 v44 h26 v56 z" />
+            <path d="M660 160 V92 h52 v-26 h22 v26 h36 v68 z" />
+            <path d="M820 160 V64 h32 v-34 h18 v34 h30 v38 h26 v58 z" />
+            <path d="M980 160 V88 h46 v-20 h22 v20 h40 v72 z" />
+            <path d="M1140 160 V98 h44 v62 z" />
+          </svg>
         </div>
 
-        {/* dekoratif altın halkalar */}
-        <div className="pointer-events-none absolute -right-40 top-1/2 hidden -translate-y-1/2 lg:block">
-          <div className="h-[34rem] w-[34rem] rounded-full border border-gold/10" />
-          <div className="absolute inset-10 rounded-full border border-gold/10" />
-          <div className="absolute inset-24 rounded-full border border-gold/15" />
+        <div className="container-px above mx-auto max-w-5xl py-20 text-center md:py-28">
+          <span className="animate-rise inline-flex items-center gap-2 rounded-full border hairline bg-white/70 px-4 py-1.5 text-xs font-medium text-cream/70 backdrop-blur-sm">
+            <span className="h-1.5 w-1.5 rounded-full bg-gold" />
+            Türkiye geneli premium ulaşım
+          </span>
+
+          <h1
+            className="animate-rise mx-auto mt-6 max-w-3xl text-4xl font-semibold leading-[1.08] md:text-6xl"
+            style={{ animationDelay: "0.06s" }}
+          >
+            Nereye giderseniz gidin,{" "}
+            <span className="gold-text">şoförünüz hazır.</span>
+          </h1>
+
+          <p
+            className="animate-rise mx-auto mt-5 max-w-xl text-lg leading-relaxed text-cream/60"
+            style={{ animationDelay: "0.12s" }}
+          >
+            Şoförlü araç, havalimanı transferi, tur ve VIP karşılama — birkaç
+            saniyede planlayın, gerisini biz halledelim.
+          </p>
+
+          <div
+            className="animate-rise mx-auto mt-9 text-left"
+            style={{ animationDelay: "0.18s" }}
+          >
+            <HeroSearch cities={cities} />
+          </div>
+
+          <div
+            className="animate-rise mt-7 flex flex-wrap items-center justify-center gap-x-7 gap-y-2 text-sm text-cream/55"
+            style={{ animationDelay: "0.24s" }}
+          >
+            <span className="inline-flex items-center gap-1.5">
+              <span className="text-gold">✓</span> Ücretsiz iptal
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span className="text-gold">✓</span> Sabit fiyat, sürpriz yok
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span className="text-gold">✓</span> 7/24 destek
+            </span>
+          </div>
         </div>
       </section>
 
