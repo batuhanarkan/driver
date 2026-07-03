@@ -6,6 +6,10 @@ import { getServices, getActiveCampaigns, CATEGORY_META } from "@/lib/services";
 import { getProvinces } from "@/lib/geo";
 import { formatTRY } from "@/lib/format";
 
+// İçerik DB'den gelir; her istekte taze render (build'de DB'ye bağımlı olmasın,
+// admin değişiklikleri anında yansısın).
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   const [services, campaigns, provinces] = await Promise.all([
     getServices(),

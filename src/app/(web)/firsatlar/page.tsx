@@ -5,6 +5,9 @@ import { getActiveCampaigns } from "@/lib/services";
 
 export const metadata: Metadata = { title: "Fırsatlar" };
 
+// Kampanyalar DB'den; her istekte taze (build DB'ye bağımlı olmasın).
+export const dynamic = "force-dynamic";
+
 function gecerlilik(b: Date | null, e: Date | null): string | null {
   const fmt = (d: Date) =>
     d.toLocaleDateString("tr-TR", {
