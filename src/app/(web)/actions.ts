@@ -5,7 +5,7 @@ import { db } from "@/lib/db";
 import { createOrderSchema, type CreateOrderInput } from "@/lib/validations/order";
 import { leadSchema, type LeadInput } from "@/lib/validations/lead";
 import { orderTotal, generateOrderNumber } from "@/lib/order";
-import { getDistrictsByProvince } from "@/lib/geo";
+import { getDistrictsByProvince, getNeighborhoodsByDistrict } from "@/lib/geo";
 
 export type CreateOrderResult =
   | { ok: true; siparisNo: string }
@@ -66,6 +66,11 @@ export async function createOrder(
 /** Client kaskad için: seçilen ilin ilçeleri. */
 export async function fetchDistricts(provinceId: string) {
   return getDistrictsByProvince(provinceId);
+}
+
+/** Client kaskad için: seçilen ilçenin mahalleleri. */
+export async function fetchNeighborhoods(districtId: string) {
+  return getNeighborhoodsByDistrict(districtId);
 }
 
 export async function createLead(

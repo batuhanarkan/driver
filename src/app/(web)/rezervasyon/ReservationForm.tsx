@@ -28,6 +28,14 @@ const inputCls =
 
 const MAX_DURAK = 5;
 
+// İl + ilçe + mahalle zorunlu (mahalle kaydı olmayan ilçede il+ilçe yeterli).
+function eksikAlan(v: LocationValue): string | null {
+  if (!v.provinceId) return "il";
+  if (!v.districtId) return "ilçe";
+  if (!v.mahalleYok && !v.mahalleId) return "mahalle";
+  return null;
+}
+
 export function ReservationForm({
   services,
   provinces,
@@ -109,26 +117,21 @@ export function ReservationForm({
     if (!service) return;
     if (!values.tarih) return setError("Lütfen bir tarih seçin.");
     if (isRoute || isGreeting) {
-      if (!kalkis.provinceId)
-        return setError(isGreeting ? "Karşılama noktasının ilini seçin." : "Kalkış ilini seçin.");
-      if (kalkis.lat == null)
-        return setError(
-          isGreeting
-            ? "Karşılama noktası için haritadan konum seçin."
-            : "Kalkış için haritadan konum seçin.",
-        );
+      const ek = eksikAlan(kalkis);
+      if (ek)
+        return setError(`${isGreeting ? "Karşılama noktası" : "Kalkış"} için ${ek} seçin.`);
     }
     if (isRoute) {
-      if (!varis.provinceId) return setError("Varış ilini seçin.");
-      if (varis.lat == null) return setError("Varış için haritadan konum seçin.");
+      const ek = eksikAlan(varis);
+      if (ek) return setError(`Varış için ${ek} seçin.`);
     }
     if (isRoute && durakVar) {
       if (duraklar.length === 0)
         return setError("Durak için 'Hayır' seçin ya da en az bir durak ekleyin.");
-      if (duraklar.some((d) => !d.provinceId))
-        return setError("Her durak için il seçin.");
-      if (duraklar.some((d) => d.lat == null))
-        return setError("Her durak için haritadan konum seçin.");
+      for (let i = 0; i < duraklar.length; i++) {
+        const ek = eksikAlan(duraklar[i]);
+        if (ek) return setError(`Durak ${i + 1} için ${ek} seçin.`);
+      }
     }
 
     // İletişim
@@ -210,7 +213,6 @@ export function ReservationForm({
               value={kalkis}
               onChange={setKalkis}
               accent="kalkis"
-              requireMap
             />
 
             {isRoute && (
@@ -220,7 +222,6 @@ export function ReservationForm({
                 value={varis}
                 onChange={setVaris}
                 accent="varis"
-                requireMap
               />
             )}
 
@@ -266,12 +267,11 @@ export function ReservationForm({
                     {duraklar.map((d, i) => (
                       <div key={i} className="relative">
                         <LocationPicker
-                          label={`Durak ${i + 1} (lokasyon zorunlu)`}
+                          label={`Durak ${i + 1}`}
                           provinces={provinces}
                           value={d}
                           onChange={(v) => setDurak(i, v)}
                           accent="durak"
-                          requireMap
                         />
                         {duraklar.length > 1 && (
                           <button

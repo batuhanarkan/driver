@@ -27,6 +27,31 @@ function titleCase(s: string): string {
     .join(" ");
 }
 
+/** Büyük harf dahil sağlam eşleştirme anahtarı (İ/I/ı → i). */
+function norm(s: string): string {
+  return s
+    .replace(/İ/g, "i").replace(/I/g, "i").replace(/ı/g, "i")
+    .replace(/Ş/g, "s").replace(/ş/g, "s")
+    .replace(/Ğ/g, "g").replace(/ğ/g, "g")
+    .replace(/Ü/g, "u").replace(/ü/g, "u")
+    .replace(/Ö/g, "o").replace(/ö/g, "o")
+    .replace(/Ç/g, "c").replace(/ç/g, "c")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+/** "AKKAYA KÖYÜ" -> "Akkaya Köyü" (büyük harf girdiyi düzgün başlıklar). */
+function properCase(s: string): string {
+  return s
+    .toLocaleLowerCase("tr-TR")
+    .split(/\s+/)
+    .map((w) => (w.length ? w[0].toLocaleUpperCase("tr-TR") + w.slice(1) : w))
+    .join(" ");
+}
+
 type RawCity = {
   name: string;
   plate: string;
@@ -110,10 +135,51 @@ async function main() {
     }
   }
 
+  // Mahalleler — yoksa ekle (kaynak: bertugfahriozer/il_ilce_mahalle, resmi/TÜİK)
+  // { İL: { İLÇE: ["X Mah.", ...] } } yapısı, mevcut ilçelere isimle eşleştirilir.
+  if ((await db.neighborhood.count()) === 0) {
+    const mraw = JSON.parse(
+      readFileSync(join(process.cwd(), "prisma", "data", "tr-mahalle.json"), "utf-8"),
+    ) as Record<string, Record<string, string[]>>;
+
+    const dists = await db.district.findMany({
+      include: { province: { select: { ad: true } } },
+    });
+    const dmap = new Map<string, string>();
+    for (const d of dists) dmap.set(`${norm(d.province.ad)}|${norm(d.ad)}`, d.id);
+
+    const rows: { ad: string; districtId: string }[] = [];
+    let eslesen = 0;
+    let atlanan = 0;
+    for (const [ilAd, ilceler] of Object.entries(mraw)) {
+      const pn = norm(ilAd);
+      for (const [ilceAd, mahalleler] of Object.entries(ilceler)) {
+        const did = dmap.get(`${pn}|${norm(ilceAd)}`);
+        if (!did) {
+          atlanan++;
+          continue;
+        }
+        eslesen++;
+        // "SUADİYE Mah." -> "Suadiye" (sondaki Mah./Mahallesi ekini at)
+        const uniq = Array.from(
+          new Set(mahalleler.map((mh) => properCase(mh.replace(/\s*mah(\.|allesi)?\s*$/i, "")))),
+        );
+        for (const ad of uniq) rows.push({ ad, districtId: did });
+      }
+    }
+    for (let i = 0; i < rows.length; i += 5000) {
+      await db.neighborhood.createMany({ data: rows.slice(i, i + 5000) });
+    }
+    console.log(
+      `Mahalle: ${rows.length} kayıt (eşleşen ilçe ${eslesen}, atlanan ${atlanan})`,
+    );
+  }
+
   const ilSayisi = await db.province.count();
   const ilceSayisi = await db.district.count();
+  const mahalleSayisi = await db.neighborhood.count();
   console.log(
-    `Seed tamamlandı: 1 admin + 5 hizmet + 4 araç + 3 kampanya + ${ilSayisi} il + ${ilceSayisi} ilçe`,
+    `Seed tamamlandı: 1 admin + 5 hizmet + 4 araç + 3 kampanya + ${ilSayisi} il + ${ilceSayisi} ilçe + ${mahalleSayisi} mahalle`,
   );
 }
 

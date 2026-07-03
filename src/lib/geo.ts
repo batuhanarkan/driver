@@ -19,3 +19,13 @@ export async function getDistrictsByProvince(provinceId: string) {
     select: { id: true, ad: true },
   });
 }
+
+/** Bir ilçenin mahalleleri (alfabetik). */
+export async function getNeighborhoodsByDistrict(districtId: string) {
+  if (!districtId) return [];
+  return db.neighborhood.findMany({
+    where: { districtId },
+    orderBy: { ad: "asc" },
+    select: { id: true, ad: true },
+  });
+}

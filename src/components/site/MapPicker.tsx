@@ -28,12 +28,14 @@ export default function MapPicker({
   center,
   value,
   title,
+  zoom,
   onConfirm,
   onClose,
 }: {
   center: LatLng;
   value: LatLng | null;
   title: string;
+  zoom?: number;
   onConfirm: (p: LatLng) => void;
   onClose: () => void;
 }) {
@@ -61,7 +63,7 @@ export default function MapPicker({
         <div className="h-[55vh] w-full">
           <MapContainer
             center={[start.lat, start.lng]}
-            zoom={value ? 14 : 11}
+            zoom={zoom ?? (value ? 15 : 11)}
             style={{ height: "100%", width: "100%" }}
             scrollWheelZoom
           >
