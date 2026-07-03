@@ -1,11 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import type { ServiceCategory } from "@prisma/client";
-import { useCart } from "@/lib/cart";
 import { formatTRY } from "@/lib/format";
 import { Button } from "@/components/ui/Button";
+import { createOrder } from "@/app/(web)/actions";
 import {
   LocationPicker,
   emptyLocation,
@@ -40,7 +40,7 @@ export function ReservationForm({
   defaults?: { ilSlug?: string; tarih?: string; durak?: number };
 }) {
   const router = useRouter();
-  const add = useCart((s) => s.add);
+  const [pending, startTransition] = useTransition();
 
   const defaultProvince = provinces.find((p) => p.slug === defaults?.ilSlug);
   const initLoc = (): LocationValue =>
@@ -64,6 +64,10 @@ export function ReservationForm({
     gun: "1",
     ...(defaults?.tarih ? { tarih: defaults.tarih } : {}),
   });
+  const [ad, setAd] = useState("");
+  const [email, setEmail] = useState("");
+  const [telefon, setTelefon] = useState("");
+  const [not, setNot] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   const service = useMemo(
@@ -127,6 +131,11 @@ export function ReservationForm({
         return setError("Her durak için haritadan konum seçin.");
     }
 
+    // İletişim
+    if (ad.trim().length < 2) return setError("Lütfen ad soyad girin.");
+    if (!/.+@.+\..+/.test(email)) return setError("Lütfen geçerli bir e-posta girin.");
+    if (telefon.trim().length < 10) return setError("Lütfen geçerli bir telefon girin.");
+
     const detay: Record<string, string | number> = {};
 
     if (isRoute || isGreeting) {
@@ -155,16 +164,17 @@ export function ReservationForm({
 
     const adet = showGun ? Math.max(1, Number(values.gun || 1)) : 1;
 
-    add({
-      serviceId: service.id,
-      serviceSlug: service.slug,
-      serviceTitle: service.baslik,
-      kategori: service.kategori,
-      detay,
-      birimFiyat,
-      adet,
+    startTransition(async () => {
+      const res = await createOrder({
+        musteriAd: ad.trim(),
+        musteriEmail: email.trim(),
+        musteriTelefon: telefon.trim(),
+        items: [{ serviceId: service.id, detay, adet }],
+        not: not || undefined,
+      });
+      if (res.ok) router.push(`/siparis-alindi?no=${res.siparisNo}`);
+      else setError(res.error);
     });
-    router.push("/sepet");
   }
 
   return (
@@ -330,11 +340,9 @@ export function ReservationForm({
             </div>
           )}
         </div>
-
-        {error && <p className="text-sm text-rose-600">{error}</p>}
       </div>
 
-      {/* özet */}
+      {/* özet + iletişim + gönder */}
       <aside className="lg:sticky lg:top-28 lg:self-start">
         <div className="glass rounded-[var(--radius)] p-7">
           <h3 className="text-xl">{service?.baslik ?? "Hizmet seçin"}</h3>
@@ -372,8 +380,41 @@ export function ReservationForm({
             ) : null}
           </div>
 
-          <Button type="submit" size="lg" className="mt-6 w-full">
-            Sepete Ekle
+          <div className="mt-5 space-y-3 border-t hairline pt-5">
+            <p className="text-sm text-cream/60">İletişim bilgileriniz</p>
+            <input
+              className={inputCls}
+              placeholder="Ad Soyad"
+              value={ad}
+              onChange={(e) => setAd(e.target.value)}
+            />
+            <input
+              className={inputCls}
+              type="email"
+              placeholder="E-posta"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <input
+              className={inputCls}
+              type="tel"
+              placeholder="Telefon (05xx...)"
+              value={telefon}
+              onChange={(e) => setTelefon(e.target.value)}
+            />
+            <textarea
+              className={inputCls}
+              rows={2}
+              placeholder="Not (opsiyonel)"
+              value={not}
+              onChange={(e) => setNot(e.target.value)}
+            />
+          </div>
+
+          {error && <p className="mt-3 text-sm text-rose-600">{error}</p>}
+
+          <Button type="submit" size="lg" disabled={pending} className="mt-5 w-full">
+            {pending ? "Gönderiliyor..." : "Talebi Gönder"}
           </Button>
           <p className="mt-3 text-center text-xs text-cream/40">
             Ödeme alınmaz — talebiniz ekibimize iletilir.

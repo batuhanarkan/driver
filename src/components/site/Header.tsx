@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Brand } from "./Brand";
-import { CartButton } from "./CartButton";
 import { MobileMenu } from "./MobileMenu";
 import { Button } from "@/components/ui/Button";
 
@@ -34,7 +33,6 @@ export function Header() {
           <div className="hidden md:block">
             <Button href="/rezervasyon">Rezervasyon</Button>
           </div>
-          <CartButton />
           <MobileMenu nav={NAV} />
         </div>
       </div>

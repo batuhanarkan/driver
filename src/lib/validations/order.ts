@@ -11,7 +11,7 @@ export const createOrderSchema = z.object({
   musteriAd: z.string().min(2, "Ad soyad girin"),
   musteriEmail: z.email("Geçerli bir e-posta girin"),
   musteriTelefon: z.string().min(10, "Geçerli bir telefon girin"),
-  items: z.array(orderItemSchema).min(1, "Sepetiniz boş"),
+  items: z.array(orderItemSchema).min(1, "En az bir hizmet gerekli"),
   not: z.string().max(1000).optional(),
 });
 
