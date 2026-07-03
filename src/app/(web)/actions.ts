@@ -1,24 +1,19 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { createOrderSchema, type CreateOrderInput } from "@/lib/validations/order";
 import { leadSchema, type LeadInput } from "@/lib/validations/lead";
 import { orderTotal, generateOrderNumber } from "@/lib/order";
+import { getDistrictsByProvince } from "@/lib/geo";
 
 export type CreateOrderResult =
   | { ok: true; siparisNo: string }
-  | { ok: false; error: string; needAuth?: boolean };
+  | { ok: false; error: string };
 
 export async function createOrder(
   input: CreateOrderInput,
 ): Promise<CreateOrderResult> {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return { ok: false, error: "Sipariş için giriş yapmalısınız.", needAuth: true };
-  }
-
   const parsed = createOrderSchema.safeParse(input);
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0].message };
@@ -53,16 +48,24 @@ export async function createOrder(
   const order = await db.order.create({
     data: {
       siparisNo: generateOrderNumber(),
-      userId: session.user.id,
+      musteriAd: parsed.data.musteriAd,
+      musteriEmail: parsed.data.musteriEmail,
+      musteriTelefon: parsed.data.musteriTelefon,
       toplamTutar: toplam,
       not: parsed.data.not,
       items: { create: itemsData },
     },
   });
 
+  // NOT: Sipariş e-postası bildirimi sonraki adımda eklenecek (mail seam hazır).
   revalidatePath("/admin/siparisler");
-  revalidatePath("/hesabim");
+  revalidatePath("/admin");
   return { ok: true, siparisNo: order.siparisNo };
+}
+
+/** Client kaskad için: seçilen ilin ilçeleri. */
+export async function fetchDistricts(provinceId: string) {
+  return getDistrictsByProvince(provinceId);
 }
 
 export async function createLead(

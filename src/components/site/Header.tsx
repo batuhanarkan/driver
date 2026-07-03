@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { auth } from "@/auth";
 import { Brand } from "./Brand";
 import { CartButton } from "./CartButton";
 import { MobileMenu } from "./MobileMenu";
@@ -13,10 +12,7 @@ const NAV = [
   { href: "/iletisim", label: "İletişim" },
 ];
 
-export async function Header() {
-  const session = await auth();
-  const user = session?.user;
-
+export function Header() {
   return (
     <header className="above sticky top-0 z-50 border-b hairline bg-ink/70 backdrop-blur-xl">
       <div className="container-px mx-auto flex h-20 max-w-7xl items-center justify-between">
@@ -35,22 +31,11 @@ export async function Header() {
         </nav>
 
         <div className="flex items-center gap-3">
+          <div className="hidden md:block">
+            <Button href="/rezervasyon">Rezervasyon</Button>
+          </div>
           <CartButton />
-          {user ? (
-            <div className="hidden items-center gap-2 md:flex">
-              <Button href="/hesabim" variant="ghost">
-                Hesabım
-              </Button>
-            </div>
-          ) : (
-            <div className="hidden items-center gap-2 md:flex">
-              <Button href="/giris" variant="ghost">
-                Giriş
-              </Button>
-              <Button href="/kayit">Üye Ol</Button>
-            </div>
-          )}
-          <MobileMenu nav={NAV} isLoggedIn={!!user} />
+          <MobileMenu nav={NAV} />
         </div>
       </div>
     </header>

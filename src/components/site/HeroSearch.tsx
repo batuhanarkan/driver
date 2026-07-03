@@ -4,15 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ServiceIcon } from "@/components/site/ServiceIcon";
 
-type Loc = { id: string; ad: string; tip: string };
+type Prov = { id: string; ad: string; slug: string };
 type Svc = { id: string; slug: string; baslik: string; kategori: string };
-type City = {
-  id: string;
-  ad: string;
-  slug: string;
-  services: Svc[];
-  locations: Loc[];
-};
 
 const ICON: Record<string, string> = {
   CHAUFFEUR: "steering",
@@ -25,56 +18,41 @@ const ICON: Record<string, string> = {
 const selectCls =
   "w-full rounded-xl border border-line bg-white px-4 py-3 text-cream outline-none transition focus:border-gold/60";
 
-export function HeroSearch({ cities }: { cities: City[] }) {
+export function HeroSearch({
+  provinces,
+  services,
+}: {
+  provinces: Prov[];
+  services: Svc[];
+}) {
   const router = useRouter();
-  const [cityId, setCityId] = useState(cities[0]?.id ?? "");
-
-  const city = cities.find((c) => c.id === cityId) ?? cities[0];
-  const services = city?.services ?? [];
-  const locations = city?.locations ?? [];
-
+  const [ilSlug, setIlSlug] = useState(provinces[0]?.slug ?? "");
   const [serviceSlug, setServiceSlug] = useState(services[0]?.slug ?? "");
-  const activeSlug = services.some((s) => s.slug === serviceSlug)
-    ? serviceSlug
-    : (services[0]?.slug ?? "");
-
-  const [nereden, setNereden] = useState("");
-  const [nereye, setNereye] = useState("");
   const [tarih, setTarih] = useState("");
+  const [durak, setDurak] = useState("0");
 
-  const activeService = services.find((s) => s.slug === activeSlug);
-  const ikiNokta =
+  const activeService = services.find((s) => s.slug === serviceSlug);
+  const stopluHizmet =
     activeService?.kategori === "TRANSFER" ||
     activeService?.kategori === "CHAUFFEUR";
 
-  function onCity(id: string) {
-    setCityId(id);
-    const c = cities.find((x) => x.id === id);
-    if (c && !c.services.some((s) => s.slug === serviceSlug)) {
-      setServiceSlug(c.services[0]?.slug ?? "");
-    }
-    setNereden("");
-    setNereye("");
-  }
-
   function submit() {
     const p = new URLSearchParams();
-    if (activeSlug) p.set("hizmet", activeSlug);
-    if (city) p.set("sehir", city.slug);
-    if (nereden) p.set("nereden", nereden);
-    if (ikiNokta && nereye) p.set("nereye", nereye);
+    if (serviceSlug) p.set("hizmet", serviceSlug);
+    if (ilSlug) p.set("il", ilSlug);
     if (tarih) p.set("tarih", tarih);
+    if (stopluHizmet && durak !== "0") p.set("durak", durak);
     router.push(`/rezervasyon?${p.toString()}`);
   }
 
-  if (!city) return null;
+  if (services.length === 0) return null;
 
   return (
     <div className="lift rounded-[calc(var(--radius)+0.4rem)] border hairline bg-white/80 p-4 backdrop-blur-sm sm:p-5">
       {/* Hizmet sekmeleri */}
       <div className="flex flex-wrap gap-2">
         {services.map((s) => {
-          const active = s.slug === activeSlug;
+          const active = s.slug === serviceSlug;
           return (
             <button
               key={s.id}
@@ -94,54 +72,26 @@ export function HeroSearch({ cities }: { cities: City[] }) {
       </div>
 
       {/* Arama satırı */}
-      <div className="mt-4 grid gap-3 md:grid-cols-[0.9fr_1fr_1fr_0.9fr_auto] md:items-end">
-        <Field label="Şehir">
+      <div
+        className={`mt-4 grid gap-3 md:items-end ${
+          stopluHizmet
+            ? "md:grid-cols-[1.1fr_1fr_0.8fr_auto]"
+            : "md:grid-cols-[1.2fr_1fr_auto]"
+        }`}
+      >
+        <Field label="Kalkış Yeri">
           <select
-            value={cityId}
-            onChange={(e) => onCity(e.target.value)}
+            value={ilSlug}
+            onChange={(e) => setIlSlug(e.target.value)}
             className={selectCls}
           >
-            {cities.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.ad}
+            {provinces.map((p) => (
+              <option key={p.id} value={p.slug}>
+                {p.ad}
               </option>
             ))}
           </select>
         </Field>
-
-        <Field label={ikiNokta ? "Nereden" : "Lokasyon"}>
-          <select
-            value={nereden}
-            onChange={(e) => setNereden(e.target.value)}
-            className={selectCls}
-          >
-            <option value="">Seçiniz</option>
-            {locations.map((l) => (
-              <option key={l.id} value={l.ad}>
-                {l.ad}
-              </option>
-            ))}
-          </select>
-        </Field>
-
-        {ikiNokta ? (
-          <Field label="Nereye">
-            <select
-              value={nereye}
-              onChange={(e) => setNereye(e.target.value)}
-              className={selectCls}
-            >
-              <option value="">Seçiniz</option>
-              {locations.map((l) => (
-                <option key={l.id} value={l.ad}>
-                  {l.ad}
-                </option>
-              ))}
-            </select>
-          </Field>
-        ) : (
-          <div className="hidden md:block" />
-        )}
 
         <Field label="Tarih">
           <input
@@ -152,11 +102,27 @@ export function HeroSearch({ cities }: { cities: City[] }) {
           />
         </Field>
 
+        {stopluHizmet && (
+          <Field label="Durak">
+            <select
+              value={durak}
+              onChange={(e) => setDurak(e.target.value)}
+              className={selectCls}
+            >
+              {[0, 1, 2, 3, 4, 5].map((n) => (
+                <option key={n} value={String(n)}>
+                  {n === 0 ? "Duraksız" : `${n} durak`}
+                </option>
+              ))}
+            </select>
+          </Field>
+        )}
+
         <button
           onClick={submit}
           className="h-[50px] rounded-xl bg-gold px-7 font-semibold text-black shadow-[0_14px_44px_-14px_rgba(168,123,41,0.65)] transition hover:brightness-105"
         >
-          Hemen Al
+          Devam Et
         </button>
       </div>
     </div>

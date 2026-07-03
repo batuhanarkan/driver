@@ -1,18 +1,19 @@
 import type { NextAuthConfig } from "next-auth";
 
 // Edge-safe temel config: Prisma/bcrypt IMPORT ETMEZ.
-// middleware.ts bunu kullanır; ağır bağımlılıklar auth.ts'de.
+// Ağır bağımlılıklar auth.ts'de. Admin erişimi admin/layout.tsx'te kontrol edilir.
 export const authConfig = {
-  pages: { signIn: "/giris" },
+  // Giriş yalnızca /admin panelinden yapılır (inline form).
+  pages: { signIn: "/admin" },
   session: { strategy: "jwt" },
   providers: [],
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
-      const isLoggedIn = !!auth?.user;
-      const role = auth?.user?.role;
       const path = nextUrl.pathname;
-      if (path.startsWith("/admin")) return isLoggedIn && role === "ADMIN";
-      if (path.startsWith("/hesabim")) return isLoggedIn;
+      // Çıplak /admin: inline giriş formu render edilsin (sayfa kendini kapatır).
+      if (path === "/admin") return true;
+      // Tüm /admin alt yolları: yalnızca ADMIN.
+      if (path.startsWith("/admin")) return auth?.user?.role === "ADMIN";
       return true;
     },
     jwt({ token, user }) {

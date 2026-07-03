@@ -5,13 +5,7 @@ import { useState } from "react";
 
 type NavItem = { href: string; label: string };
 
-export function MobileMenu({
-  nav,
-  isLoggedIn,
-}: {
-  nav: NavItem[];
-  isLoggedIn: boolean;
-}) {
+export function MobileMenu({ nav }: { nav: NavItem[] }) {
   const [open, setOpen] = useState(false);
   const close = () => setOpen(false);
 
@@ -52,20 +46,9 @@ export function MobileMenu({
               </Link>
             ))}
             <div className="mt-6 h-px bg-line/60" />
-            {isLoggedIn ? (
-              <Link href="/hesabim" onClick={close} className="text-xl text-cream/80">
-                Hesabım
-              </Link>
-            ) : (
-              <div className="flex flex-col gap-3">
-                <Link href="/giris" onClick={close} className="text-xl text-cream/80">
-                  Giriş Yap
-                </Link>
-                <Link href="/kayit" onClick={close} className="text-xl text-gold">
-                  Üye Ol
-                </Link>
-              </div>
-            )}
+            <Link href="/rezervasyon" onClick={close} className="text-xl text-gold">
+              Rezervasyon Oluştur
+            </Link>
           </nav>
         </div>
       )}

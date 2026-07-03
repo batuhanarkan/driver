@@ -26,6 +26,67 @@ export function generateOrderNumber(): string {
   return `VD-${t}${r}`;
 }
 
+/**
+ * Sipariş detay JSON'unu görüntü satırlarına çevirir.
+ * "X Konumu" anahtarları ayrı satır olmaz; ilgili "X" satırına harita linki olarak iliştirilir.
+ */
+export type DetayRow = { label: string; value: string; mapUrl?: string };
+
+/**
+ * Harita linkini href'e koymadan önce güvenli hale getirir.
+ * detay JSON'u misafir client'tan geldiği için `javascript:`/`data:` gibi
+ * şemalar reddedilir (admin panelinde stored-XSS'i engeller).
+ */
+function safeMapUrl(raw: unknown): string | undefined {
+  if (typeof raw !== "string") return undefined;
+  try {
+    const u = new URL(raw);
+    return u.protocol === "https:" || u.protocol === "http:"
+      ? u.toString()
+      : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+// Mantıklı görüntü sırası (JSON/jsonb anahtar sırası güvenilmez).
+const DETAY_ORDER = [
+  "Kalkış",
+  "Karşılama Noktası",
+  "Durak 1",
+  "Durak 2",
+  "Durak 3",
+  "Durak 4",
+  "Durak 5",
+  "Varış",
+  "Bölge / Rota",
+  "Rehber Dili",
+  "Tarih",
+  "Saat",
+  "Kişi Sayısı",
+  "Süre (gün)",
+  "Uçuş No",
+];
+
+export function detayRows(
+  detay: Record<string, string | number>,
+): DetayRow[] {
+  const rows: DetayRow[] = [];
+  for (const [k, v] of Object.entries(detay)) {
+    if (k.endsWith(" Konumu")) continue; // ana satıra iliştirilir
+    rows.push({
+      label: k,
+      value: String(v),
+      mapUrl: safeMapUrl(detay[`${k} Konumu`]),
+    });
+  }
+  const rank = (l: string) => {
+    const i = DETAY_ORDER.indexOf(l);
+    return i === -1 ? DETAY_ORDER.length : i;
+  };
+  return rows.sort((a, b) => rank(a.label) - rank(b.label));
+}
+
 /** Sipariş durum makinesi: her durumdan izin verilen geçişler. */
 export const ORDER_FLOW: Record<OrderStatus, OrderStatus[]> = {
   BEKLEMEDE: ["ONAYLANDI", "IPTAL"],

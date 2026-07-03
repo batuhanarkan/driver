@@ -1,6 +1,6 @@
-import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { Sidebar } from "@/components/admin/Sidebar";
+import { AdminLogin } from "./AdminLogin";
 
 export default async function AdminLayout({
   children,
@@ -8,7 +8,7 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }) {
   const session = await auth();
-  if (session?.user?.role !== "ADMIN") redirect("/giris");
+  if (session?.user?.role !== "ADMIN") return <AdminLogin />;
 
   return (
     <div className="above min-h-screen md:grid md:grid-cols-[250px_1fr]">

@@ -41,31 +41,14 @@ enum LeadType {
   KARIYER
 }
 
-enum LocationType {
-  HAVALIMANI
-  OTEL
-  SEMT
-  DIGER
-}
-
 model User {
   id        String   @id @default(cuid())
   ad        String
   email     String   @unique
   sifreHash String
   telefon   String?
-  rol         Role                 @default(USER)
-  orders      Order[]
-  resetTokens PasswordResetToken[]
-  createdAt   DateTime             @default(now())
-}
-
-model PasswordResetToken {
-  id        String   @id @default(cuid())
-  tokenHash String   @unique
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  expiresAt DateTime
+  rol       Role     @default(USER)
+  orders    Order[]
   createdAt DateTime @default(now())
 }
 
@@ -81,7 +64,6 @@ model Service {
   aktif       Boolean         @default(true)
   orderItems  OrderItem[]
   campaigns   Campaign[]
-  cities      City[]
   createdAt   DateTime        @default(now())
 }
 
@@ -97,15 +79,19 @@ model Vehicle {
 }
 
 model Order {
-  id          String      @id @default(cuid())
-  siparisNo   String      @unique
-  userId      String
-  user        User        @relation(fields: [userId], references: [id])
-  durum       OrderStatus @default(BEKLEMEDE)
-  toplamTutar Int
-  not         String?
-  items       OrderItem[]
-  createdAt   DateTime    @default(now())
+  id             String      @id @default(cuid())
+  siparisNo      String      @unique
+  // Misafir sipariş: kullanıcı girişi yok, iletişim bilgisi siparişte tutulur.
+  musteriAd      String
+  musteriEmail   String
+  musteriTelefon String
+  userId         String?
+  user           User?       @relation(fields: [userId], references: [id])
+  durum          OrderStatus @default(BEKLEMEDE)
+  toplamTutar    Int
+  not            String?
+  items          OrderItem[]
+  createdAt      DateTime    @default(now())
 }
 
 model OrderItem {
@@ -145,22 +131,23 @@ model Lead {
   createdAt DateTime @default(now())
 }
 
-model City {
+// ─────────── Konum: 81 il + ilçeler (seed ile dolu, admin'den yönetilmez) ───────────
+
+model Province {
   id        String     @id @default(cuid())
   ad        String
   slug      String     @unique
-  aktif     Boolean    @default(true)
-  siralama  Int        @default(0)
-  locations Location[]
-  services  Service[]
-  createdAt DateTime   @default(now())
+  plaka     Int        @unique
+  lat       Float
+  lng       Float
+  districts District[]
 }
 
-model Location {
-  id     String       @id @default(cuid())
-  cityId String
-  city   City         @relation(fields: [cityId], references: [id], onDelete: Cascade)
-  ad     String
-  tip    LocationType @default(DIGER)
-  aktif  Boolean      @default(true)
+model District {
+  id         String   @id @default(cuid())
+  ad         String
+  provinceId String
+  province   Province @relation(fields: [provinceId], references: [id], onDelete: Cascade)
+
+  @@unique([provinceId, ad])
 }

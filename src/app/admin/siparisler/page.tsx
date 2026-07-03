@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { formatTRY, formatDate } from "@/lib/format";
-import { StatusBadge } from "@/components/admin/StatusBadge";
 import { PageHeader } from "@/components/admin/PageHeader";
+import { OrderRow } from "./OrderRow";
 import { STATUS_LABEL } from "@/lib/order";
 import type { OrderStatus } from "@prisma/client";
 
@@ -20,7 +20,7 @@ export default async function SiparislerPage({
 
   const siparisler = await db.order.findMany({
     where: durum ? { durum } : undefined,
-    include: { user: true, items: true },
+    include: { items: true },
     orderBy: { createdAt: "desc" },
   });
 
@@ -56,7 +56,6 @@ export default async function SiparislerPage({
               <tr>
                 <th className="px-5 py-3 font-medium">Sipariş No</th>
                 <th className="px-5 py-3 font-medium">Müşteri</th>
-                <th className="px-5 py-3 font-medium">Kalem</th>
                 <th className="px-5 py-3 font-medium">Tutar</th>
                 <th className="px-5 py-3 font-medium">Tarih</th>
                 <th className="px-5 py-3 font-medium">Durum</th>
@@ -64,32 +63,15 @@ export default async function SiparislerPage({
             </thead>
             <tbody>
               {siparisler.map((o) => (
-                <tr
+                <OrderRow
                   key={o.id}
-                  className="border-t hairline transition hover:bg-cream/[0.03]"
-                >
-                  <td className="px-5 py-3">
-                    <Link
-                      href={`/admin/siparisler/${o.id}`}
-                      className="text-gold/90 transition hover:text-gold"
-                    >
-                      {o.siparisNo}
-                    </Link>
-                  </td>
-                  <td className="px-5 py-3 text-cream/75">{o.user.ad}</td>
-                  <td className="px-5 py-3 text-cream/55">
-                    {o.items.length} kalem
-                  </td>
-                  <td className="px-5 py-3 text-cream/75">
-                    {formatTRY(o.toplamTutar)}
-                  </td>
-                  <td className="px-5 py-3 text-cream/55">
-                    {formatDate(o.createdAt)}
-                  </td>
-                  <td className="px-5 py-3">
-                    <StatusBadge durum={o.durum} />
-                  </td>
-                </tr>
+                  id={o.id}
+                  siparisNo={o.siparisNo}
+                  musteriAd={o.musteriAd}
+                  tutar={formatTRY(o.toplamTutar)}
+                  tarih={formatDate(o.createdAt)}
+                  durum={o.durum}
+                />
               ))}
             </tbody>
           </table>

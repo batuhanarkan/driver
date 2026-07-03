@@ -3,14 +3,14 @@ import { Button } from "@/components/ui/Button";
 import { ServiceIcon } from "@/components/site/ServiceIcon";
 import { HeroSearch } from "@/components/site/HeroSearch";
 import { getServices, getActiveCampaigns, CATEGORY_META } from "@/lib/services";
-import { getCitiesForSearch } from "@/lib/cities";
+import { getProvinces } from "@/lib/geo";
 import { formatTRY } from "@/lib/format";
 
 export default async function HomePage() {
-  const [services, campaigns, cities] = await Promise.all([
+  const [services, campaigns, provinces] = await Promise.all([
     getServices(),
     getActiveCampaigns(),
-    getCitiesForSearch(),
+    getProvinces(),
   ]);
 
   return (
@@ -64,7 +64,15 @@ export default async function HomePage() {
             className="animate-rise mx-auto mt-9 text-left"
             style={{ animationDelay: "0.18s" }}
           >
-            <HeroSearch cities={cities} />
+            <HeroSearch
+              provinces={provinces.map((p) => ({ id: p.id, ad: p.ad, slug: p.slug }))}
+              services={services.map((s) => ({
+                id: s.id,
+                slug: s.slug,
+                baslik: s.baslik,
+                kategori: s.kategori,
+              }))}
+            />
           </div>
 
           <div

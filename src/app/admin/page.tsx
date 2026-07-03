@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { formatTRY, formatDate } from "@/lib/format";
 import { StatCard } from "@/components/admin/StatCard";
@@ -6,17 +7,19 @@ import { StatusBadge } from "@/components/admin/StatusBadge";
 import { PageHeader } from "@/components/admin/PageHeader";
 
 export default async function AdminDashboard() {
+  // Çıplak /admin middleware ile korunmaz (giriş formu için); veri çekmeden önce kapat.
+  const session = await auth();
+  if (session?.user?.role !== "ADMIN") return null;
+
   const [
     toplamSiparis,
     bekleyen,
-    toplamKullanici,
     yeniTalep,
     ciroRows,
     sonSiparisler,
   ] = await Promise.all([
     db.order.count(),
     db.order.count({ where: { durum: "BEKLEMEDE" } }),
-    db.user.count({ where: { rol: "USER" } }),
     db.lead.count(),
     db.order.aggregate({
       _sum: { toplamTutar: true },
@@ -25,7 +28,7 @@ export default async function AdminDashboard() {
     db.order.findMany({
       take: 6,
       orderBy: { createdAt: "desc" },
-      include: { user: true, items: true },
+      include: { items: true },
     }),
   ]);
 
@@ -41,7 +44,7 @@ export default async function AdminDashboard() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Toplam Sipariş" value={toplamSiparis} />
         <StatCard label="Bekleyen Sipariş" value={bekleyen} hint="İşlem bekliyor" />
-        <StatCard label="Kayıtlı Kullanıcı" value={toplamKullanici} />
+        <StatCard label="Yeni Talep" value={yeniTalep} hint="İletişim/başvuru" />
         <StatCard label="Onaylı Ciro" value={formatTRY(ciro)} hint="İptal hariç" />
       </div>
 
@@ -89,7 +92,7 @@ export default async function AdminDashboard() {
                         {o.items.length} kalem
                       </span>
                     </td>
-                    <td className="px-5 py-3 text-cream/75">{o.user.ad}</td>
+                    <td className="px-5 py-3 text-cream/75">{o.musteriAd}</td>
                     <td className="px-5 py-3 text-cream/75">
                       {formatTRY(o.toplamTutar)}
                     </td>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ReservationForm } from "./ReservationForm";
-import { getServices, getVehicles } from "@/lib/services";
+import { getServices } from "@/lib/services";
+import { getProvinces } from "@/lib/geo";
 
 export const metadata: Metadata = { title: "Rezervasyon" };
 
@@ -9,18 +10,18 @@ export default async function RezervasyonPage({
 }: {
   searchParams: Promise<{
     hizmet?: string;
-    sehir?: string;
-    nereden?: string;
-    nereye?: string;
+    il?: string;
     tarih?: string;
+    durak?: string;
   }>;
 }) {
-  const [sp, services, vehicles] = await Promise.all([
+  const [sp, services, provinces] = await Promise.all([
     searchParams,
     getServices(),
-    getVehicles(),
+    getProvinces(),
   ]);
   const hizmet = sp.hizmet;
+  const durak = sp.durak ? parseInt(sp.durak, 10) : 0;
 
   return (
     <section className="container-px mx-auto max-w-7xl py-20">
@@ -40,15 +41,9 @@ export default async function RezervasyonPage({
             kategori: s.kategori,
             temelFiyat: s.temelFiyat,
           }))}
-          vehicles={vehicles.map((v) => ({
-            id: v.id,
-            ad: v.ad,
-            sinif: v.sinif,
-            kapasite: v.kapasite,
-            fiyat: v.fiyat,
-          }))}
+          provinces={provinces}
           defaultSlug={hizmet}
-          defaults={{ nereden: sp.nereden, nereye: sp.nereye, tarih: sp.tarih }}
+          defaults={{ ilSlug: sp.il, tarih: sp.tarih, durak }}
         />
       </div>
     </section>
